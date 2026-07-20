@@ -1,3 +1,45 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local GroupService = game:GetService("GroupService")
+
+local function checkForStaff()
+    local creatorId = game.CreatorId
+    local creatorType = game.CreatorType.Name
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local isStaff = false
+            
+            if creatorType == "User" and player.UserId == creatorId then
+                isStaff = true
+            elseif creatorType == "Group" then
+                local rank = player:GetRankInGroup(creatorId)
+                if rank >= 200 then
+                    isStaff = true
+                end
+            end
+            
+            local knownMods = {}
+            for _, modId in ipairs(knownMods) do
+                if player.UserId == modId then
+                    isStaff = true
+                    break
+                end
+            end
+            
+            if isStaff then
+                LocalPlayer:Kick("Staff detected.")
+                return
+            end
+        end
+    end
+end
+
+checkForStaff()
+Players.PlayerAdded:Connect(function()
+    task.wait(1.5)
+    checkForStaff()
+end)
 local placeId = game.PlaceId
 
 if placeId == 137303692488494 then
